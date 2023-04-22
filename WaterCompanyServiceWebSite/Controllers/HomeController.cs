@@ -26,7 +26,25 @@ namespace WaterCompanyServiceWebSite.Controllers
         [HttpPost]
         public IActionResult Verify(User user)
         {
-            return View();
+            User loginUser = DataAccess.Login2(user);
+            if (loginUser == null || !loginUser.AccountActive)
+            {
+                return View("Login");
+            }
+            else
+            {
+                switch (loginUser.UserType)
+                {
+                    case "admin":
+                        return View("AdminPanel");
+                    case "employe":
+                        return View("EmployePanel");
+                    case "consumner":
+                        return View("ConsumerPanel");
+                    default:
+                        return View("Error");
+                }
+            }
         }
 
         public IActionResult Privacy()
