@@ -26,7 +26,7 @@ namespace WaterCompanyServiceWebSite.Controllers
         [HttpPost]
         public IActionResult Verify(User user)
         {
-            User loginUser = DataAccess.Login2(user);
+            User loginUser = DataAccess.Login(user);
             if (loginUser == null || !loginUser.AccountActive)
             {
                 return View("Login");
