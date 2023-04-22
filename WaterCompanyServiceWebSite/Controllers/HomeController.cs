@@ -47,6 +47,27 @@ namespace WaterCompanyServiceWebSite.Controllers
             }
         }
 
+        public IActionResult Register()
+        {
+            Consumer consumer = new Consumer();
+            return View(consumer);
+        }
+
+        [HttpPost]
+        public IActionResult Register(Consumer consumer,String passwordConfirm)
+        {
+            if(consumer.User.Password != passwordConfirm)
+            {
+                ViewBag.Message = "Password does not match";
+                return View(consumer);
+            }
+            else
+            {
+                return View("RegisterSuccess");
+            }
+            
+        }
+
         public IActionResult Privacy()
         {
             return View();
