@@ -20,52 +20,92 @@ namespace WaterCompanyServiceWebSite.Controllers
 
         public IActionResult Login()
         {
+            if(DataAccess.CurrentUser != null)
+            {
+                return RedirectUser(DataAccess.CurrentUser);
+            }
             return View();
         }
 
         [HttpPost]
-        public IActionResult Verify(User user)
+        public IActionResult Login(User user)
         {
-            User loginUser = DataAccess.Login(user);
-            if (loginUser == null || !loginUser.AccountActive)
+            if(!ModelState.IsValid)
             {
-                return View("Login");
+                return View();
             }
             else
             {
-                switch (loginUser.UserType)
+                User loginUser = DataAccess.Login(user);
+                if (loginUser == null)
                 {
-                    case "admin":
-                        return View("AdminPanel");
-                    case "employe":
-                        return View("EmployePanel");
-                    case "consumner":
-                        return View("ConsumerPanel");
-                    default:
-                        return View("Error");
+                    ViewBag.Message = "Username or password incorrect";
+                    return View();
                 }
+                else if (!loginUser.AccountActive)
+                {
+                    ViewBag.Message = "This account is not active";
+                    return View();
+                }
+                else
+                {
+                    DataAccess.CurrentUser = loginUser;
+                    return RedirectUser(loginUser);
+                }
+            }
+        }
+
+        private IActionResult RedirectUser(User user)
+        {
+            switch (user.UserType)
+            {
+                case "admin":
+                    return RedirectToAction("Index", "AdminPanel");
+                case "employe":
+                    return RedirectToAction("Index", "EmployeePanel");
+                case "consumner":
+                    return RedirectToAction("Index", "ConsumerPanel");
+                default:
+                    return View("Error");
             }
         }
 
         public IActionResult Register()
         {
-            Consumer consumer = new Consumer();
-            return View(consumer);
+            if (DataAccess.CurrentUser != null)
+            {
+                return RedirectUser(DataAccess.CurrentUser);
+            }
+            return View();
         }
 
         [HttpPost]
         public IActionResult Register(Consumer consumer,String passwordConfirm)
         {
-            if(consumer.User.Password != passwordConfirm)
+            if (!ModelState.IsValid)
             {
-                ViewBag.Message = "Password does not match";
-                return View(consumer);
+                return View();
             }
             else
             {
-                return View("RegisterSuccess");
+                if(DataAccess.UserNameExists(consumer.User.UserName))
+                {
+                    ViewBag.Message = "User name already exists";
+                    return View(consumer);
+                }
+                else if (consumer.User.Password != passwordConfirm)
+                {
+                    ViewBag.Message = "Password does not match";
+                    return View(consumer);
+                }
+                else
+                {
+                    consumer.User.UserType = "consumer";
+                    consumer.User.AccountActive = false;
+                    DataAccess.AddConsumer(consumer);
+                    return View("RegisterSuccess");
+                }
             }
-            
         }
 
         public IActionResult Privacy()

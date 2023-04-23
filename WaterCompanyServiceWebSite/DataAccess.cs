@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 using Newtonsoft.Json;
 using System.Net.Mime;
 using System.Text;
@@ -9,6 +10,8 @@ namespace WaterCompanyServiceWebSite
     public static class DataAccess
     {
         private static string BaseURL = "https://wcsapi.bsite.net/";
+        //private static string BaseURL = "https://localhost:7186/";
+        public static User CurrentUser = null;
 
         public static User Login(User user)
         {
@@ -28,6 +31,78 @@ namespace WaterCompanyServiceWebSite
                     if(response.Result.IsSuccessStatusCode)
                     {
                         result = response.Result.Content.ReadFromJsonAsync<User>().Result;
+                    }
+                }
+                return result;
+            }
+        }
+
+        public static bool UserNameExists(string userName)
+        {
+            using (var httpClient = new HttpClient())
+            {
+                var request = new HttpRequestMessage
+                {
+                    Method = HttpMethod.Get,
+                    RequestUri = new Uri($"{BaseURL}user/exists/{userName}")                
+                };
+
+                using (var response = httpClient.SendAsync(request))
+                {
+                    if (response.Result.IsSuccessStatusCode)
+                    {
+                        return JsonConvert.DeserializeObject<bool>(response.Result.Content.ReadAsStringAsync().Result);
+                    }
+                }
+                return true;
+            }
+        }
+
+        public static void AddConsumer(Consumer consumer)
+        {
+            try
+            {
+                using (var httpClient = new HttpClient())
+                {
+                    String json = JsonConvert.SerializeObject(consumer);
+                    var request = new HttpRequestMessage
+                    {
+                        Method = HttpMethod.Post,
+                        RequestUri = new Uri($"{BaseURL}consumer"),
+                        Content = new StringContent(json, Encoding.UTF8, "application/json"),
+                    };
+
+                    using (var response = httpClient.SendAsync(request))
+                    {
+                        if (!response.Result.IsSuccessStatusCode)
+                        {
+                            throw new Exception();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public static List<User> GetUsers()
+        {
+            List<User> result = new List<User>();
+            using (var httpClient = new HttpClient())
+            {
+                var request = new HttpRequestMessage
+                {
+                    Method = HttpMethod.Get,
+                    RequestUri = new Uri($"{BaseURL}user"),
+                };
+
+                using (var response = httpClient.SendAsync(request))
+                {
+                    if (response.Result.IsSuccessStatusCode)
+                    {
+                        result = response.Result.Content.ReadFromJsonAsync<List<User>>().Result;
                     }
                 }
                 return result;
