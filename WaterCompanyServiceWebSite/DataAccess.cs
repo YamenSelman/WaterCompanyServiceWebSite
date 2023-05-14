@@ -21,7 +21,7 @@ namespace WaterCompanyServiceWebSite
                 String json = JsonConvert.SerializeObject(user);
                 var request = new HttpRequestMessage
                 {
-                    Method = HttpMethod.Get,
+                    Method = HttpMethod.Post,
                     RequestUri = new Uri($"{BaseURL}user/login"),
                     Content = new StringContent(json, Encoding.UTF8, "application/json"),
                 };
@@ -106,6 +106,64 @@ namespace WaterCompanyServiceWebSite
                     }
                 }
                 return result;
+            }
+        }
+
+        public static User GetUser(int id)
+        {
+            User result = null;
+            try
+            { 
+                using (var httpClient = new HttpClient())
+                {
+                    var request = new HttpRequestMessage
+                    {
+                        Method = HttpMethod.Get,
+                        RequestUri = new Uri($"{BaseURL}user/{id}"),
+                    };
+
+                    using (var response = httpClient.SendAsync(request))
+                    {
+                        if (response.Result.IsSuccessStatusCode)
+                        {
+                            result = response.Result.Content.ReadFromJsonAsync<User>().Result;
+                        }
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error: {ex.Message}");
+            }
+            return result;
+        }
+
+        public static void UpdateUser(User user)
+        {
+            try
+            {
+                using (var httpClient = new HttpClient())
+                {
+                    String json = JsonConvert.SerializeObject(user);
+                    var request = new HttpRequestMessage
+                    {
+                        Method = HttpMethod.Put,
+                        RequestUri = new Uri($"{BaseURL}user/{user.Id}"),
+                        Content = new StringContent(json, Encoding.UTF8, "application/json"),
+                    };
+
+                    using (var response = httpClient.SendAsync(request))
+                    {
+                        if (response.Result.IsSuccessStatusCode)
+                        {
+                            return;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error: {ex.Message}");
             }
         }
     }

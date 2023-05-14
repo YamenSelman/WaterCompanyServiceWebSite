@@ -63,7 +63,7 @@ namespace WaterCompanyServiceWebSite.Controllers
                     return RedirectToAction("Index", "AdminPanel");
                 case "employe":
                     return RedirectToAction("Index", "EmployeePanel");
-                case "consumner":
+                case "consumer":
                     return RedirectToAction("Index", "ConsumerPanel");
                 default:
                     return View("Error");
