@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System.Diagnostics;
 using WaterCompanyServicesAPI;
 using WaterCompanyServiceWebSite.Models;
@@ -7,6 +8,7 @@ namespace WaterCompanyServiceWebSite.Controllers
 {
     public class HomeController : Controller
     {
+        Random rnd = new Random();
         private readonly ILogger<HomeController> _logger;
         public HomeController(ILogger<HomeController> logger)
         {

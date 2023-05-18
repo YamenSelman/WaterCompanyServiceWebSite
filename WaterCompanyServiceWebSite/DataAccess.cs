@@ -13,6 +13,10 @@ namespace WaterCompanyServiceWebSite
         //private static string BaseURL = "https://localhost:7186/";
         public static User CurrentUser = null;
 
+        public static void log(string msg)
+        {
+            System.Diagnostics.Debug.WriteLine(msg);
+        }
         public static User Login(User user)
         {
             User result = null;
@@ -69,6 +73,35 @@ namespace WaterCompanyServiceWebSite
                     {
                         Method = HttpMethod.Post,
                         RequestUri = new Uri($"{BaseURL}consumer"),
+                        Content = new StringContent(json, Encoding.UTF8, "application/json"),
+                    };
+
+                    using (var response = httpClient.SendAsync(request))
+                    {
+                        if (!response.Result.IsSuccessStatusCode)
+                        {
+                            throw new Exception();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public static void AddSubscription(Subscription sub)
+        {
+            try
+            {
+                using (var httpClient = new HttpClient())
+                {
+                    String json = JsonConvert.SerializeObject(sub);
+                    var request = new HttpRequestMessage
+                    {
+                        Method = HttpMethod.Post,
+                        RequestUri = new Uri($"{BaseURL}subscription"),
                         Content = new StringContent(json, Encoding.UTF8, "application/json"),
                     };
 
@@ -165,6 +198,64 @@ namespace WaterCompanyServiceWebSite
             {
                 System.Diagnostics.Debug.WriteLine($"Error: {ex.Message}");
             }
+        }
+
+        public static Boolean test(string username)
+        {
+            Boolean result = false;
+            try
+            {
+                using (var httpClient = new HttpClient())
+                {
+                    var request = new HttpRequestMessage
+                    {
+                        Method = HttpMethod.Get,
+                        RequestUri = new Uri($"{BaseURL}user/exists/{username}"),
+                    };
+
+                    using (var response = httpClient.SendAsync(request))
+                    {
+                        if (response.Result.IsSuccessStatusCode)
+                        {
+                            result = response.Result.Content.ReadFromJsonAsync<Boolean>().Result;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error: {ex.Message}");
+            }
+            return result;
+        }
+
+        public static Subscription getSubscriptionByBarcode(string barcode)
+        {
+            Subscription result = null;
+            try
+            {
+                using (var httpClient = new HttpClient())
+                {
+                    var request = new HttpRequestMessage
+                    {
+                        Method = HttpMethod.Get,
+                        RequestUri = new Uri($"{BaseURL}subscription/getbybarcode/{barcode}"),
+                    };
+
+                    using (var response = httpClient.SendAsync(request))
+                    {
+                        if (response.Result.IsSuccessStatusCode)
+                        {
+                            result = response.Result.Content.ReadFromJsonAsync<Subscription>().Result;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error: {ex.Message}");
+            }
+            return result;
         }
     }
 }
