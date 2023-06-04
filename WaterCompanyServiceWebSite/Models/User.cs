@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
 
 namespace WaterCompanyServicesAPI
 {
@@ -17,8 +16,9 @@ namespace WaterCompanyServicesAPI
         [Display(Name = "Password")]
         public string Password { get; set; }
 
+        [Required]
         [Display(Name = "User Type")]
-        public string? UserType { get; set; }
+        public string UserType { get; set; }
 
         [DefaultValue(true)]
         public bool AccountActive { get; set; }

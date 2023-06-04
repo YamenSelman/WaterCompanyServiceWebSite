@@ -1,15 +1,17 @@
-﻿using Microsoft.AspNetCore.Mvc.Formatters;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 using Newtonsoft.Json;
 using System.Net.Mime;
 using System.Text;
 using WaterCompanyServicesAPI;
+using WaterCompanyServicesAPI.Models;
 
 namespace WaterCompanyServiceWebSite
 {
     public static class DataAccess
     {
-        private static string BaseURL = "https://wcsapi.bsite.net/";
+        private static string BaseURL = "http://WCSAPI23.somee.com/";
         //private static string BaseURL = "https://localhost:7186/";
         public static User CurrentUser = null;
 
@@ -142,6 +144,28 @@ namespace WaterCompanyServiceWebSite
             }
         }
 
+        public static List<Department> GetDepartments()
+        {
+            List<Department> result = new List<Department>();
+            using (var httpClient = new HttpClient())
+            {
+                var request = new HttpRequestMessage
+                {
+                    Method = HttpMethod.Get,
+                    RequestUri = new Uri($"{BaseURL}department"),
+                };
+
+                using (var response = httpClient.SendAsync(request))
+                {
+                    if (response.Result.IsSuccessStatusCode)
+                    {
+                        result = response.Result.Content.ReadFromJsonAsync<List<Department>>().Result;
+                    }
+                }
+                return result;
+            }
+        }
+
         public static User GetUser(int id)
         {
             User result = null;
@@ -229,6 +253,7 @@ namespace WaterCompanyServiceWebSite
             return result;
         }
 
+        [HttpPost]
         public static Subscription getSubscriptionByBarcode(string barcode)
         {
             Subscription result = null;
@@ -256,6 +281,147 @@ namespace WaterCompanyServiceWebSite
                 System.Diagnostics.Debug.WriteLine($"Error: {ex.Message}");
             }
             return result;
+        }
+
+        public static void AddEmployee(Employee employee)
+        {
+            try
+            {
+                using (var httpClient = new HttpClient())
+                {
+                    String json = JsonConvert.SerializeObject(employee);
+                    var request = new HttpRequestMessage
+                    {
+                        Method = HttpMethod.Post,
+                        RequestUri = new Uri($"{BaseURL}employee"),
+                        Content = new StringContent(json, Encoding.UTF8, "application/json"),
+                    };
+
+                    using (var response = httpClient.SendAsync(request))
+                    {
+                        if (!response.Result.IsSuccessStatusCode)
+                        {
+                            throw new Exception();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public static Employee getCurrentEmployee()
+        {
+            Employee result = null;
+            try
+            {
+                using (var httpClient = new HttpClient())
+                {
+                    var request = new HttpRequestMessage
+                    {
+                        Method = HttpMethod.Get,
+                        RequestUri = new Uri($"{BaseURL}employee/getbyuser/{CurrentUser.Id}"),
+                    };
+
+                    using (var response = httpClient.SendAsync(request))
+                    {
+                        if (response.Result.IsSuccessStatusCode)
+                        {
+                            result = response.Result.Content.ReadFromJsonAsync<Employee>().Result;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error: {ex.Message}");
+            }
+            return result;
+        }
+
+        public static Consumer getCurrentConsumer()
+        {
+            Consumer result = null;
+            try
+            {
+                using (var httpClient = new HttpClient())
+                {
+                    var request = new HttpRequestMessage
+                    {
+                        Method = HttpMethod.Get,
+                        RequestUri = new Uri($"{BaseURL}consumer/getbyuser/{CurrentUser.Id}"),
+                    };
+
+                    using (var response = httpClient.SendAsync(request))
+                    {
+                        if (response.Result.IsSuccessStatusCode)
+                        {
+                            result = response.Result.Content.ReadFromJsonAsync<Consumer>().Result;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error: {ex.Message}");
+            }
+            return result;
+        }
+
+        public static Request AddRequest(Request req)
+        {
+            Request result = null;
+            try
+            {
+                using (var httpClient = new HttpClient())
+                {
+                    String json = JsonConvert.SerializeObject(req);
+                    var request = new HttpRequestMessage
+                    {
+                        Method = HttpMethod.Post,
+                        RequestUri = new Uri($"{BaseURL}request"),
+                        Content = new StringContent(json, Encoding.UTF8, "application/json"),
+                    };
+
+                    using (var response = httpClient.SendAsync(request))
+                    {
+                        if (response.Result.IsSuccessStatusCode)
+                        {
+                            result = response.Result.Content.ReadFromJsonAsync<Request>().Result;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            return result;
+        }
+
+        public static List<Request> GetPendingRequests()
+        {
+            List<Request> result = new List<Request>();
+            using (var httpClient = new HttpClient())
+            {
+                int id = getCurrentEmployee().Department.Id;
+                var request = new HttpRequestMessage
+                {
+                    Method = HttpMethod.Get,
+                    RequestUri = new Uri($"{BaseURL}request/getpending/{id}"),
+                };
+
+                using (var response = httpClient.SendAsync(request))
+                {
+                    if (response.Result.IsSuccessStatusCode)
+                    {
+                        result = response.Result.Content.ReadFromJsonAsync<List<Request>>().Result;
+                    }
+                }
+                return result;
+            }
         }
     }
 }

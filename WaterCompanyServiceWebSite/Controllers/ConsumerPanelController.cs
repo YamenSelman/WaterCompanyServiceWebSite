@@ -29,7 +29,48 @@ namespace WaterCompanyServiceWebSite.Controllers
             {
                 ViewBag.Message = "No subscription with this barcode";
             }
+            else if(sub.Consumer != null)
+            {
+                ViewBag.Message = "This subscription is attached to another consumer";
+                return View(null);
+            }
             return View(sub);
+        } 
+        
+        public IActionResult SubmitAttachRequest(Subscription sub)
+        {
+            try
+            {
+                sub = DataAccess.getSubscriptionByBarcode(sub.ConsumerBarCode);
+                if (sub != null)
+                {
+                    if (sub.Consumer == null)
+                    {
+                        Request req = new Request();
+                        req.RequestType = "attach";
+                        req.CurrentDepartment = DataAccess.GetDepartments().Where(d => d.Id == 2).FirstOrDefault();
+                        req.RequestDate = DateTime.Now;
+                        req.Consumer = DataAccess.getCurrentConsumer();
+                        req.Subscription = sub;
+                        req.RequestStatus = "onprogress";
+                        req = DataAccess.AddRequest(req);
+                        if(req != null)
+                        {
+                            ViewBag.Message = "Request Added Successfully";
+                        }
+                        else
+                        {
+                            ViewBag.Message = "Error Adding Request";
+                        }
+
+                    }
+                }
+            }
+            catch(Exception e)
+            {
+                ViewBag.Message = $"Error: {e.Message}";
+            }
+            return View("Index");
         }
     }
 }

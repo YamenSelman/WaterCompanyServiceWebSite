@@ -9,21 +9,22 @@ namespace WaterCompanyServicesAPI
     {
         [Key]
         public int Id { get; set; }
-        public RequestType RequestType { get; set; }
+        public string RequestType { get; set; }
 
         [Required]
         [Display(Name = "Request Date")]
+        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}")]
         public DateTime RequestDate { get; set; }
 
         [AllowNull]
-        public Consumer Consumer { get; set; }
+        public Consumer? Consumer { get; set; }
         [AllowNull]
-        public Subscription Subscription { get; set; }
+        public Subscription? Subscription { get; set; }
 
         [Required]
         [Display(Name = "Request Status")]
         public string RequestStatus { get; set; }
-        public Employee Employee { get; set; }
+        public Department? CurrentDepartment { get; set; }
 
         public virtual ICollection<RequestDocument> Documents { get; set; }
 

@@ -32,28 +32,21 @@ namespace WaterCompanyServiceWebSite.Controllers
         [HttpPost]
         public IActionResult Login(User user)
         {
-            if(!ModelState.IsValid)
+            User loginUser = DataAccess.Login(user);
+            if (loginUser == null)
             {
+                ViewBag.Message = "Username or password incorrect";
+                return View();
+            }
+            else if (!loginUser.AccountActive)
+            {
+                ViewBag.Message = "This account is not active";
                 return View();
             }
             else
             {
-                User loginUser = DataAccess.Login(user);
-                if (loginUser == null)
-                {
-                    ViewBag.Message = "Username or password incorrect";
-                    return View();
-                }
-                else if (!loginUser.AccountActive)
-                {
-                    ViewBag.Message = "This account is not active";
-                    return View();
-                }
-                else
-                {
-                    DataAccess.CurrentUser = loginUser;
-                    return RedirectUser(loginUser);
-                }
+                DataAccess.CurrentUser = loginUser;
+                return RedirectUser(loginUser);
             }
         }
 
@@ -63,7 +56,7 @@ namespace WaterCompanyServiceWebSite.Controllers
             {
                 case "admin":
                     return RedirectToAction("Index", "AdminPanel");
-                case "employe":
+                case "employee":
                     return RedirectToAction("Index", "EmployeePanel");
                 case "consumer":
                     return RedirectToAction("Index", "ConsumerPanel");

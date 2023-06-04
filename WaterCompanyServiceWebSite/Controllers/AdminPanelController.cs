@@ -30,5 +30,29 @@ namespace WaterCompanyServiceWebSite.Controllers
             return RedirectToAction("UserManagement", "AdminPanel");
         }
 
+        public IActionResult AddEmployee()
+        {
+            var deps = DataAccess.GetDepartments();
+            ViewBag.data = deps;
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult AddEmployee(Employee employee)
+        {
+            if (DataAccess.UserNameExists(employee.User.UserName))
+            {
+                ViewBag.Message = "User Name Exists, please use another User Name";
+                var deps = DataAccess.GetDepartments();
+                ViewBag.data = deps;
+                return View(employee);
+            }
+            
+            employee.User.AccountActive = true;
+            employee.User.UserType = "employee";
+            DataAccess.AddEmployee(employee);
+            return RedirectToAction("UserManagement", "AdminPanel");
+        }
+
     }
 }

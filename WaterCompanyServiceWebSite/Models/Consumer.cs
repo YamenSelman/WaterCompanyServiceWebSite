@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
+
 
 namespace WaterCompanyServicesAPI
 {
@@ -21,9 +21,7 @@ namespace WaterCompanyServicesAPI
         public string ConsumerAddress { get; set; }
 
         public User User { get; set; }
-
-        public virtual ICollection<Subscription>? Subscriptions { get; set; }
-
-        public virtual ICollection<Request>? Requests { get; set; }
+        public virtual ICollection<Subscription> Subscriptions { get; set; }
+        public virtual ICollection<Request> Requests { get; set; }
     }
 }
