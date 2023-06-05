@@ -24,7 +24,7 @@ namespace WaterCompanyServiceWebSite.Controllers
         [HttpPost]
         public IActionResult AddSubscription(Subscription sub)
         {
-            sub = DataAccess.getSubscriptionByBarcode(sub.ConsumerBarCode);
+            sub = DataAccess.GetSubscriptionByBarcode(sub.ConsumerBarCode);
             if(sub == null)
             {
                 ViewBag.Message = "No subscription with this barcode";
@@ -41,7 +41,7 @@ namespace WaterCompanyServiceWebSite.Controllers
         {
             try
             {
-                sub = DataAccess.getSubscriptionByBarcode(sub.ConsumerBarCode);
+                sub = DataAccess.GetSubscriptionByBarcode(sub.ConsumerBarCode);
                 if (sub != null)
                 {
                     if (sub.Consumer == null)
@@ -50,7 +50,7 @@ namespace WaterCompanyServiceWebSite.Controllers
                         req.RequestType = "attach";
                         req.CurrentDepartment = DataAccess.GetDepartments().Where(d => d.Id == 2).FirstOrDefault();
                         req.RequestDate = DateTime.Now;
-                        req.Consumer = DataAccess.getCurrentConsumer();
+                        req.Consumer = DataAccess.GetCurrentConsumer();
                         req.Subscription = sub;
                         req.RequestStatus = "onprogress";
                         req = DataAccess.AddRequest(req);

@@ -224,37 +224,9 @@ namespace WaterCompanyServiceWebSite
             }
         }
 
-        public static Boolean test(string username)
-        {
-            Boolean result = false;
-            try
-            {
-                using (var httpClient = new HttpClient())
-                {
-                    var request = new HttpRequestMessage
-                    {
-                        Method = HttpMethod.Get,
-                        RequestUri = new Uri($"{BaseURL}user/exists/{username}"),
-                    };
-
-                    using (var response = httpClient.SendAsync(request))
-                    {
-                        if (response.Result.IsSuccessStatusCode)
-                        {
-                            result = response.Result.Content.ReadFromJsonAsync<Boolean>().Result;
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Error: {ex.Message}");
-            }
-            return result;
-        }
 
         [HttpPost]
-        public static Subscription getSubscriptionByBarcode(string barcode)
+        public static Subscription GetSubscriptionByBarcode(string barcode)
         {
             Subscription result = null;
             try
@@ -312,7 +284,7 @@ namespace WaterCompanyServiceWebSite
             }
         }
 
-        public static Employee getCurrentEmployee()
+        public static Employee GetCurrentEmployee()
         {
             Employee result = null;
             try
@@ -341,7 +313,7 @@ namespace WaterCompanyServiceWebSite
             return result;
         }
 
-        public static Consumer getCurrentConsumer()
+        public static Consumer GetCurrentConsumer()
         {
             Consumer result = null;
             try
@@ -406,7 +378,7 @@ namespace WaterCompanyServiceWebSite
             List<Request> result = new List<Request>();
             using (var httpClient = new HttpClient())
             {
-                int id = getCurrentEmployee().Department.Id;
+                int id = GetCurrentEmployee().Department.Id;
                 var request = new HttpRequestMessage
                 {
                     Method = HttpMethod.Get,
@@ -421,6 +393,68 @@ namespace WaterCompanyServiceWebSite
                     }
                 }
                 return result;
+            }
+        }
+
+        public static Request GetRequest(int id)
+        {
+            Request result = null;
+            try
+            {
+                using (var httpClient = new HttpClient())
+                {
+                    var request = new HttpRequestMessage
+                    {
+                        Method = HttpMethod.Get,
+                        RequestUri = new Uri($"{BaseURL}request/{id}"),
+                    };
+
+                    using (var response = httpClient.SendAsync(request))
+                    {
+                        if (response.Result.IsSuccessStatusCode)
+                        {
+                            result = response.Result.Content.ReadFromJsonAsync<Request>().Result;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error: {ex.Message}");
+            }
+            return result;
+        }
+
+        public static bool AcceptRequest(int id)
+        {
+            try
+            {
+                int uid = GetCurrentEmployee().Id;
+                using (var httpClient = new HttpClient())
+                {
+                    var request = new HttpRequestMessage
+                    {
+                        Method = HttpMethod.Get,
+                        RequestUri = new Uri($"{BaseURL}request/accept/{id}/{uid}"),
+                    };
+
+                    using (var response = httpClient.SendAsync(request))
+                    {
+                        if (response.Result.IsSuccessStatusCode)
+                        {
+                            return response.Result.Content.ReadFromJsonAsync<bool>().Result;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+                return false;
             }
         }
     }

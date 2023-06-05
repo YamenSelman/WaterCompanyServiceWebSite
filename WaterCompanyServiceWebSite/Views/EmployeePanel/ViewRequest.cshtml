@@ -1,0 +1,115 @@
+﻿@model WaterCompanyServicesAPI.Request
+
+@{
+    ViewData["Title"] = "Request Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="container py-2 h-100 m-auto">
+    <div class="row d-flex justify-content-center align-items-center">
+        <div class="card bg-dark text-white" style="border-radius: 1rem;">
+            <div class="card-body p-5 text-center">
+                <h1 class="text-start">Request Details</h1>
+                <div class="row">
+                    <div class="row text-center bg-light bg-opacity-10 rounded-3 m-auto p-3">
+                        <div>
+                            <h3 class="bg-white bg-opacity-25 rounded-3 p-2">Request</h3>
+                        </div>
+                        <div class="text-start row fs-3">
+                            <div class="col-6">
+                                @Html.LabelFor(modelItem => Model.Id)
+                            </div>
+                            <div class="col-6">
+                                @Html.DisplayFor(modelItem => Model.Id)
+                            </div>
+                        </div>
+                        <div class="text-start row fs-3">
+                            <div class="col-6">
+                                @Html.LabelFor(modelItem => Model.RequestDate)
+                            </div>
+                            <div class="col-6">
+                                @Html.DisplayFor(modelItem => Model.RequestDate)
+                            </div>
+                        </div>                        
+                        <div class="text-start row fs-3">
+                            <div class="col-6">
+                                @Html.LabelFor(modelItem => Model.RequestType)
+                            </div>
+                            <div class="col-6">
+                                @Html.DisplayFor(modelItem => Model.RequestType)
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row text-center bg-light bg-opacity-10 rounded-3 m-auto p-3">
+                        <div>
+                            <h3 class="bg-white bg-opacity-25 rounded-3 p-2">Consumer</h3>
+                        </div>
+                        <div class="text-start row fs-3">
+                            <div class="col-6">
+                                @Html.LabelFor(modelItem => Model.Consumer.ConsumerName)
+                            </div>
+                            <div class="col-6">
+                                @Html.DisplayFor(modelItem => Model.Consumer.ConsumerName)
+                            </div>
+                        </div>
+                        <div class="text-start row fs-3">
+                            <div class="col-6">
+                                @Html.LabelFor(modelItem => Model.Consumer.ConsumerAddress)
+                            </div>
+                            <div class="col-6">
+                                @Html.DisplayFor(modelItem => Model.Consumer.ConsumerAddress)
+                            </div>
+                        </div>                        
+                        <div class="text-start row fs-3">
+                            <div class="col-6">
+                                @Html.LabelFor(modelItem => Model.Consumer.ConsumerPhone)
+                            </div>
+                            <div class="col-6">
+                                @Html.DisplayFor(modelItem => Model.Consumer.ConsumerPhone)
+                            </div>
+                        </div>
+                    </div>                    
+                    <div class="row text-center bg-light bg-opacity-10 rounded-3 m-auto p-3">
+                        <div>
+                            <h3 class="bg-white bg-opacity-25 rounded-3 p-2">Subscription</h3>
+                        </div>
+                        <div class="text-start row fs-3">
+                            <div class="col-6">
+                                @Html.LabelFor(modelItem => Model.Subscription.ConsumerBarCode)
+                            </div>
+                            <div class="col-6">
+                                @Html.DisplayFor(modelItem => Model.Subscription.ConsumerBarCode)
+                            </div>
+                        </div>
+                        <div class="text-start row fs-3">
+                            <div class="col-6">
+                                @Html.LabelFor(modelItem => Model.Subscription.ConsumerSubscriptionNo)
+                            </div>
+                            <div class="col-6">
+                                @Html.DisplayFor(modelItem => Model.Subscription.ConsumerSubscriptionNo)
+                            </div>
+                        </div>                        
+                        <div class="text-start row fs-3">
+                            <div class="col-6">
+                                @Html.LabelFor(modelItem => Model.Subscription.SubscriptionAddress)
+                            </div>
+                            <div class="col-6">
+                                @Html.DisplayFor(modelItem => Model.Subscription.SubscriptionAddress)
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row text-center bg-light bg-opacity-10 rounded-3 m-auto p-3">
+                        <div>
+                            <h3 class="bg-white bg-opacity-25 rounded-3 p-2">Action</h3>
+                        </div>
+                        <div class="text-start row fs-3">
+                            @Html.ActionLink("Accept", "AcceptRequest", new {id = Model.Id},new {@class="btn btn-lg btn-outline-success w-25 m-auto"})
+                            @Html.ActionLink("Reject", "RejectRequest", new {id = Model.Id},new {@class="btn btn-lg btn-outline-danger w-25 m-auto"})
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
