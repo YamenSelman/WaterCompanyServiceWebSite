@@ -425,17 +425,17 @@ namespace WaterCompanyServiceWebSite
             return result;
         }
 
-        public static bool AcceptRequest(int id)
+        public static bool AcceptRequest(int rid)
         {
             try
             {
-                int uid = GetCurrentEmployee().Id;
+                int eid = GetCurrentEmployee().Id;
                 using (var httpClient = new HttpClient())
                 {
                     var request = new HttpRequestMessage
                     {
                         Method = HttpMethod.Get,
-                        RequestUri = new Uri($"{BaseURL}request/accept/{id}/{uid}"),
+                        RequestUri = new Uri($"{BaseURL}request/accept/{rid}/{eid}"),
                     };
 
                     using (var response = httpClient.SendAsync(request))

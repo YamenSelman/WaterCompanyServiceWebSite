@@ -25,9 +25,9 @@ namespace WaterCompanyServiceWebSite.Controllers
             }
         }
 
-        public IActionResult AcceptRequest(int id)
+        public IActionResult AcceptRequest(int rid)
         {
-            var m = DataAccess.GetRequest(id);
+            var m = DataAccess.GetRequest(rid);
             if(m != null)
             {
                 if(DataAccess.AcceptRequest(m.Id))
