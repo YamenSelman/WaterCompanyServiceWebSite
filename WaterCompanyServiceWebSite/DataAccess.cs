@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 using Newtonsoft.Json;
 using System.Net.Mime;
+using System.Security.Cryptography;
 using System.Text;
 using WaterCompanyServicesAPI;
 using WaterCompanyServicesAPI.Models;
@@ -11,8 +12,8 @@ namespace WaterCompanyServiceWebSite
 {
     public static class DataAccess
     {
-        private static string BaseURL = "http://WCSAPI23.somee.com/";
-        //private static string BaseURL = "https://localhost:7186/";
+        //private static string BaseURL = "http://WCSAPI23.somee.com/";
+        private static string BaseURL = "https://localhost:7186/";
         public static User CurrentUser = null;
 
         public static void log(string msg)
@@ -32,9 +33,9 @@ namespace WaterCompanyServiceWebSite
                     Content = new StringContent(json, Encoding.UTF8, "application/json"),
                 };
 
-                using (var response =  httpClient.SendAsync(request))
+                using (var response = httpClient.SendAsync(request))
                 {
-                    if(response.Result.IsSuccessStatusCode)
+                    if (response.Result.IsSuccessStatusCode)
                     {
                         result = response.Result.Content.ReadFromJsonAsync<User>().Result;
                     }
@@ -50,7 +51,7 @@ namespace WaterCompanyServiceWebSite
                 var request = new HttpRequestMessage
                 {
                     Method = HttpMethod.Get,
-                    RequestUri = new Uri($"{BaseURL}user/exists/{userName}")                
+                    RequestUri = new Uri($"{BaseURL}user/exists/{userName}")
                 };
 
                 using (var response = httpClient.SendAsync(request))
@@ -170,7 +171,7 @@ namespace WaterCompanyServiceWebSite
         {
             User result = null;
             try
-            { 
+            {
                 using (var httpClient = new HttpClient())
                 {
                     var request = new HttpRequestMessage
@@ -188,7 +189,7 @@ namespace WaterCompanyServiceWebSite
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Error: {ex.Message}");
             }
@@ -425,7 +426,7 @@ namespace WaterCompanyServiceWebSite
             return result;
         }
 
-        public static bool AcceptRequest(int rid)
+        public static bool AcceptRequest(int rid, string notes = "")
         {
             try
             {
@@ -435,7 +436,40 @@ namespace WaterCompanyServiceWebSite
                     var request = new HttpRequestMessage
                     {
                         Method = HttpMethod.Get,
-                        RequestUri = new Uri($"{BaseURL}request/accept/{rid}/{eid}"),
+                        RequestUri = new Uri($"{BaseURL}request/accept/{rid}/{eid}/{notes}"),
+                    };
+
+                    using (var response = httpClient.SendAsync(request))
+                    {
+                        if (response.Result.IsSuccessStatusCode)
+                        {
+                            return response.Result.Content.ReadFromJsonAsync<bool>().Result;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+                return false;
+            }
+        }
+
+        public static bool RejectRequest(int rid, string notes = "")
+        {
+            try
+            {
+                int eid = GetCurrentEmployee().Id;
+                using (var httpClient = new HttpClient())
+                {
+                    var request = new HttpRequestMessage
+                    {
+                        Method = HttpMethod.Get,
+                        RequestUri = new Uri($"{BaseURL}request/reject/{rid}/{eid}/{notes}"),
                     };
 
                     using (var response = httpClient.SendAsync(request))

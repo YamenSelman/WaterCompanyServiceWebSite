@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WaterCompanyServicesAPI;
+using WaterCompanyServicesAPI.Models;
+using WaterCompanyServiceWebSite.Models;
 
 namespace WaterCompanyServiceWebSite.Controllers
 {
@@ -13,10 +15,13 @@ namespace WaterCompanyServiceWebSite.Controllers
 
         public IActionResult ViewRequest(int id)
         {
-            Request req = DataAccess.GetRequest(id);
-            if(req != null)
+            ViewRequestObj obj = new ViewRequestObj();
+            obj.Request = DataAccess.GetRequest(id);
+            obj.Log = new RequestsLog();
+
+            if (obj.Request != null)
             {
-                return View(req);
+                return View(obj);
             }
             else
             {
@@ -25,18 +30,32 @@ namespace WaterCompanyServiceWebSite.Controllers
             }
         }
 
-        public IActionResult AcceptRequest(int rid)
+        [HttpPost]
+        public IActionResult ProcessRequest(ViewRequestObj obj)
         {
-            var m = DataAccess.GetRequest(rid);
-            if(m != null)
+            if(obj.Request != null)
             {
-                if(DataAccess.AcceptRequest(m.Id))
+                if(obj.Log.Decision)
                 {
-                    ViewBag.Message = "Success";
+                    if (DataAccess.AcceptRequest(obj.Request.Id, obj.Log.Notes))
+                    {
+                        ViewBag.Message = "Success";
+                    }
+                    else
+                    {
+                        ViewBag.Message = "Fail";
+                    }
                 }
                 else
                 {
-                    ViewBag.Message = "Fail";
+                    if(DataAccess.RejectRequest(obj.Request.Id,obj.Log.Notes))
+                    {
+                        ViewBag.Message = "Success";
+                    }
+                    else
+                    {
+                        ViewBag.Message = "Fail";
+                    }
                 }
             }
             else
