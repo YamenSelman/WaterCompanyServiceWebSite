@@ -12,8 +12,8 @@ namespace WaterCompanyServiceWebSite
 {
     public static class DataAccess
     {
-        //private static string BaseURL = "http://WCSAPI23.somee.com/";
-        private static string BaseURL = "https://localhost:7186/";
+        private static string BaseURL = "http://WCSAPI23.somee.com/";
+        //private static string BaseURL = "https://localhost:7186/";
         public static User CurrentUser = null;
 
         public static void log(string msg)
@@ -226,7 +226,6 @@ namespace WaterCompanyServiceWebSite
         }
 
 
-        [HttpPost]
         public static Subscription GetSubscriptionByBarcode(string barcode)
         {
             Subscription result = null;
@@ -245,6 +244,93 @@ namespace WaterCompanyServiceWebSite
                         if (response.Result.IsSuccessStatusCode)
                         {
                             result = response.Result.Content.ReadFromJsonAsync<Subscription>().Result;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error: {ex.Message}");
+            }
+            return result;
+        }
+
+        public static Subscription GetSubscription(int sid)
+        {
+            Subscription result = null;
+            try
+            {
+                using (var httpClient = new HttpClient())
+                {
+                    var request = new HttpRequestMessage
+                    {
+                        Method = HttpMethod.Get,
+                        RequestUri = new Uri($"{BaseURL}subscription/{sid}"),
+                    };
+
+                    using (var response = httpClient.SendAsync(request))
+                    {
+                        if (response.Result.IsSuccessStatusCode)
+                        {
+                            result = response.Result.Content.ReadFromJsonAsync<Subscription>().Result;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error: {ex.Message}");
+            }
+            return result;
+        }
+
+        public static List<Subscription> GetConsumerSubscription()
+        {
+            List<Subscription> result = null;
+            try
+            {
+                using (var httpClient = new HttpClient())
+                {
+                    var request = new HttpRequestMessage
+                    {
+                        Method = HttpMethod.Get,
+                        RequestUri = new Uri($"{BaseURL}subscription/getConsumerSubscriptions/{GetCurrentConsumer().Id}"),
+                    };
+
+                    using (var response = httpClient.SendAsync(request))
+                    {
+                        if (response.Result.IsSuccessStatusCode)
+                        {
+                            result = response.Result.Content.ReadFromJsonAsync<List<Subscription>>().Result;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error: {ex.Message}");
+            }
+            return result;
+        }        
+        
+        public static List<Invoice> GetUnpaidInvoices(string barcode)
+        {
+            List<Invoice> result = null;
+            try
+            {
+                using (var httpClient = new HttpClient())
+                {
+                    var request = new HttpRequestMessage
+                    {
+                        Method = HttpMethod.Get,
+                        RequestUri = new Uri($"{BaseURL}invoice/getunpaidbybarcode/{barcode}"),
+                    };
+
+                    using (var response = httpClient.SendAsync(request))
+                    {
+                        if (response.Result.IsSuccessStatusCode)
+                        {
+                            result = response.Result.Content.ReadFromJsonAsync<List<Invoice>>().Result;
                         }
                     }
                 }

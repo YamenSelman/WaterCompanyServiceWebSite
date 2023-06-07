@@ -30,6 +30,12 @@ namespace WaterCompanyServiceWebSite.Controllers
             }
         }
 
+        public IActionResult Logout()
+        {
+            DataAccess.CurrentUser = null;
+            return RedirectToAction("Index", "Home");
+        }
+
         [HttpPost]
         public IActionResult ProcessRequest(ViewRequestObj obj)
         {

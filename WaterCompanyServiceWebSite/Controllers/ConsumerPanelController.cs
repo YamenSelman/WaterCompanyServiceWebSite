@@ -56,11 +56,11 @@ namespace WaterCompanyServiceWebSite.Controllers
                         req = DataAccess.AddRequest(req);
                         if(req != null)
                         {
-                            ViewBag.Message = "Request Added Successfully";
+                            ViewBag.Message = "Request added successfully";
                         }
                         else
                         {
-                            ViewBag.Message = "Error Adding Request";
+                            ViewBag.Message = "Error submitting the request";
                         }
 
                     }
@@ -71,6 +71,62 @@ namespace WaterCompanyServiceWebSite.Controllers
                 ViewBag.Message = $"Error: {e.Message}";
             }
             return View("Index");
+        }
+        
+        
+        public IActionResult ClearanceRequest()
+        {
+            var subs = DataAccess.GetConsumerSubscription();
+            return View(subs);
+        }        
+        
+        public IActionResult SubmitClearanceRequest(int sid)
+        {
+            var sub = DataAccess.GetSubscription(sid);
+            if(sub != null)
+            {
+                try
+                {
+                    var unpaidInvoices = DataAccess.GetUnpaidInvoices(sub.ConsumerBarCode).Sum(i=>i.InvoiceValue);
+                    if (unpaidInvoices <= 0)
+                    {
+                        Request req = new Request();
+                        req.RequestType = "clearance";
+                        req.CurrentDepartment = DataAccess.GetDepartments().Where(d => d.Id == 2).FirstOrDefault();
+                        req.RequestDate = DateTime.Now;
+                        req.Consumer = DataAccess.GetCurrentConsumer();
+                        req.Subscription = sub;
+                        req.RequestStatus = "onprogress";
+                        req = DataAccess.AddRequest(req);
+                        if (req != null)
+                        {
+                            ViewBag.Message = "Request added successfully";
+                        }
+                        else
+                        {
+                            ViewBag.Message = "Error submiting the request";
+                        }
+
+                    }
+                    else
+                    {
+                        ViewBag.Message = $"The subscription have unpaid invoices .. Total unpaid amount = {unpaidInvoices}";
+                        var subs = DataAccess.GetConsumerSubscription();
+                        return View("ClearanceRequest", subs);
+                    }
+                }
+                catch (Exception e)
+                {
+                    ViewBag.Message = $"Error: {e.Message}";
+                }
+                return View("index");
+            }
+            else
+            {
+                var subs = DataAccess.GetConsumerSubscription();
+                return View("ClearanceRequest",subs);
+            }
+            
         }
     }
 }
