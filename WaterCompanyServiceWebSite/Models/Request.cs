@@ -13,7 +13,6 @@ namespace WaterCompanyServicesAPI
 
         [Required]
         [Display(Name = "Request Date")]
-        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}")]
         public DateTime RequestDate { get; set; }
 
         [AllowNull]
