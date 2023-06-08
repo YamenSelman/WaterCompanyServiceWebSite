@@ -33,7 +33,7 @@ namespace WaterCompanyServiceWebSite.Controllers
         public IActionResult AddEmployee()
         {
             var deps = DataAccess.GetDepartments();
-            ViewBag.data = deps;
+            ViewData["departments"] = deps;
             return View();
         }
 

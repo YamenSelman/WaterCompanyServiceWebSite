@@ -25,18 +25,18 @@ namespace WaterCompanyServiceWebSite.Controllers
         public IActionResult AddSubscription(Subscription sub)
         {
             sub = DataAccess.GetSubscriptionByBarcode(sub.ConsumerBarCode);
-            if(sub == null)
+            if (sub == null)
             {
                 ViewBag.Message = "No subscription with this barcode";
             }
-            else if(sub.Consumer != null)
+            else if (sub.Consumer != null)
             {
                 ViewBag.Message = "This subscription is attached to another consumer";
                 return View(null);
             }
             return View(sub);
-        } 
-        
+        }
+
         public IActionResult SubmitAttachRequest(Subscription sub)
         {
             try
@@ -54,7 +54,7 @@ namespace WaterCompanyServiceWebSite.Controllers
                         req.Subscription = sub;
                         req.RequestStatus = "onprogress";
                         req = DataAccess.AddRequest(req);
-                        if(req != null)
+                        if (req != null)
                         {
                             ViewBag.Message = "Request added successfully";
                         }
@@ -66,28 +66,28 @@ namespace WaterCompanyServiceWebSite.Controllers
                     }
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 ViewBag.Message = $"Error: {e.Message}";
             }
             return View("Index");
         }
-        
-        
+
+
         public IActionResult ClearanceRequest()
         {
             var subs = DataAccess.GetConsumerSubscription();
             return View(subs);
-        }        
-        
+        }
+
         public IActionResult SubmitClearanceRequest(int sid)
         {
             var sub = DataAccess.GetSubscription(sid);
-            if(sub != null)
+            if (sub != null)
             {
                 try
                 {
-                    var unpaidInvoices = DataAccess.GetUnpaidInvoices(sub.ConsumerBarCode).Sum(i=>i.InvoiceValue);
+                    var unpaidInvoices = DataAccess.GetUnpaidInvoices(sub.ConsumerBarCode).Sum(i => i.InvoiceValue);
                     if (unpaidInvoices <= 0)
                     {
                         Request req = new Request();
@@ -124,9 +124,64 @@ namespace WaterCompanyServiceWebSite.Controllers
             else
             {
                 var subs = DataAccess.GetConsumerSubscription();
-                return View("ClearanceRequest",subs);
+                return View("ClearanceRequest", subs);
             }
-            
+
+        }
+
+        public IActionResult NewSubscriptionRequest()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult SubmitNewSubscriptionRequest(int sid)
+        {
+            var sub = DataAccess.GetSubscription(sid);
+            if (sub != null)
+            {
+                try
+                {
+                    var unpaidInvoices = DataAccess.GetUnpaidInvoices(sub.ConsumerBarCode).Sum(i => i.InvoiceValue);
+                    if (unpaidInvoices <= 0)
+                    {
+                        Request req = new Request();
+                        req.RequestType = "clearance";
+                        req.CurrentDepartment = DataAccess.GetDepartments().Where(d => d.Id == 2).FirstOrDefault();
+                        req.RequestDate = DateTime.Now;
+                        req.Consumer = DataAccess.GetCurrentConsumer();
+                        req.Subscription = sub;
+                        req.RequestStatus = "onprogress";
+                        req = DataAccess.AddRequest(req);
+                        if (req != null)
+                        {
+                            ViewBag.Message = "Request added successfully";
+                        }
+                        else
+                        {
+                            ViewBag.Message = "Error submiting the request";
+                        }
+
+                    }
+                    else
+                    {
+                        ViewBag.Message = $"The subscription have unpaid invoices .. Total unpaid amount = {unpaidInvoices}";
+                        var subs = DataAccess.GetConsumerSubscription();
+                        return View("ClearanceRequest", subs);
+                    }
+                }
+                catch (Exception e)
+                {
+                    ViewBag.Message = $"Error: {e.Message}";
+                }
+                return View("index");
+            }
+            else
+            {
+                var subs = DataAccess.GetConsumerSubscription();
+                return View("ClearanceRequest", subs);
+            }
+
         }
     }
 }

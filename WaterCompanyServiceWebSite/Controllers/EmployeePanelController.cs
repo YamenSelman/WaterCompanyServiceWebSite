@@ -21,7 +21,26 @@ namespace WaterCompanyServiceWebSite.Controllers
 
             if (obj.Request != null)
             {
-                return View(obj);
+                switch(obj.Request.RequestType)
+                {
+                    case "attach":
+                        return View("ViewAttachRequest",obj);
+                    case "clearance":
+                        var invoices = DataAccess.GetInvoices(obj.Request.Subscription.ConsumerBarCode);
+                        if(invoices != null)
+                        {
+                            ViewData["total"] = invoices.Sum(i=>i.InvoiceValue);
+                            ViewData["unpaid"] = invoices.Where(i=>i.InvoiceStatus == false).Sum(i=>i.InvoiceValue);
+                        }
+                        else
+                        {
+                            ViewData["total"] = "No Invoices";
+                            ViewData["unpaid"] = "No Invoices";
+                        }
+                        return View("ViewClearanceRequest", obj);
+                    default:
+                        return RedirectToAction("Index");
+                }
             }
             else
             {
@@ -45,28 +64,28 @@ namespace WaterCompanyServiceWebSite.Controllers
                 {
                     if (DataAccess.AcceptRequest(obj.Request.Id, obj.Log.Notes))
                     {
-                        ViewBag.Message = "Success";
+                        ViewData["msg"] = "Request Processed Success";
                     }
                     else
                     {
-                        ViewBag.Message = "Fail";
+                        ViewData["msg"] = "Failed To Process Request";
                     }
                 }
                 else
                 {
                     if(DataAccess.RejectRequest(obj.Request.Id,obj.Log.Notes))
                     {
-                        ViewBag.Message = "Success";
+                        ViewData["msg"] = "Request Processed Success";
                     }
                     else
                     {
-                        ViewBag.Message = "Fail";
+                        ViewData["msg"] = "Failed To Process Request";
                     }
                 }
             }
             else
             {
-                ViewBag.Message = "RequestNotFound";
+                ViewData["msg"] = "Request Not Found";
             }
             return RedirectToAction("index");
         }

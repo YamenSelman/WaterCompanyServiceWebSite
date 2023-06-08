@@ -12,8 +12,8 @@ namespace WaterCompanyServiceWebSite
 {
     public static class DataAccess
     {
-        private static string BaseURL = "http://WCSAPI23.somee.com/";
-        //private static string BaseURL = "https://localhost:7186/";
+        //private static string BaseURL = "http://WCSAPI23.somee.com/";
+        private static string BaseURL = "https://localhost:7186/";
         public static User CurrentUser = null;
 
         public static void log(string msg)
@@ -576,6 +576,35 @@ namespace WaterCompanyServiceWebSite
                 System.Diagnostics.Debug.WriteLine(ex.Message);
                 return false;
             }
+        }
+
+        public static List<Invoice> GetInvoices(string barcode)
+        {
+            List<Invoice> result = null;
+            try
+            {
+                using (var httpClient = new HttpClient())
+                {
+                    var request = new HttpRequestMessage
+                    {
+                        Method = HttpMethod.Get,
+                        RequestUri = new Uri($"{BaseURL}invoice/getbybarcode/{barcode}"),
+                    };
+
+                    using (var response = httpClient.SendAsync(request))
+                    {
+                        if (response.Result.IsSuccessStatusCode)
+                        {
+                            result = response.Result.Content.ReadFromJsonAsync<List<Invoice>>().Result;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error: {ex.Message}");
+            }
+            return result;
         }
     }
 }

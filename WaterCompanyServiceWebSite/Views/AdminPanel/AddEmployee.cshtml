@@ -48,7 +48,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label asp-for="Department.DepartmentName" class="control-label"></label>
-                                        @Html.DropDownListFor(m=>m.Department.Id,new SelectList(ViewBag.data,"Id","DepartmentName"), new {@class="form-control"})
+                                        @Html.DropDownListFor(m=>m.Department.Id,new SelectList(ViewData["departments"] as List<WaterCompanyServicesAPI.Models.Department>,"Id","DepartmentName"), new {@class="form-control text-center"})
                                         <span asp-validation-for="Department.Id" class="text-danger"></span>
                                     </div>
                                 </div>
